@@ -23,5 +23,4 @@ export class MaiorIdadeDirective implements Validator{
 
       return ehMaior ? null : { 'maiorIdadeValidator': true };
   }
-
 }

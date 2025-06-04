@@ -1,16 +1,28 @@
-import { Directive } from '@angular/core';
-import { NG_ASYNC_VALIDATORS } from '@angular/forms';
+import { ConsultaCepService } from "./../service/consulta-cep.service";
+import { Directive } from "@angular/core";
+import { AbstractControl, AsyncValidator, NG_ASYNC_VALIDATORS, ValidationErrors } from "@angular/forms";
+import { map, Observable } from "rxjs";
 
 @Directive({
-  selector: '[appValidandoCep]',
-  providers: [{
-    provide: NG_ASYNC_VALIDATORS,
-    useExisting: ValidandoCepDirective,
-    multi: true
-  }]
+  selector: "[validadorCep]",
+  providers: [
+    {
+      provide: NG_ASYNC_VALIDATORS,
+      useExisting: ValidandoCepDirective,
+      multi: true,
+    },
+  ],
 })
-export class ValidandoCepDirective {
+export class ValidandoCepDirective implements AsyncValidator {
+  constructor(private consultaCepService: ConsultaCepService) { }
 
-  constructor() { }
+  validate(
+    control: AbstractControl<any, any>
+  ): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> {
+    const cep = control.value;
 
+    return this.consultaCepService.getConsultaCep(cep).pipe(map(
+      (resultado: any) => resultado.erro ? { 'validadorCep': true } : null
+    ))
+  }
 }
